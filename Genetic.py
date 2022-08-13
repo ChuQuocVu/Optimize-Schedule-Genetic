@@ -335,6 +335,8 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
 
     # cut_position = cutPosition(n, a)
 
+    Parent_truck_cut_position = cut_position
+
     Trucksequence = [0, *r, s, *cut_position]
 
     Truck = [0]*a
@@ -396,6 +398,8 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
             dd1 = dd1 + 1
     
     # cut_position = cutPosition(n, c)
+
+    Parent_crane_cut_position = cut_position
 
     Cranesequence = [0, *r, s, *cut_position]
 
@@ -580,7 +584,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
       
 
         # Selective
-        if (AvgFinishTime <= childAvgFinishTime) or (AvgFinishTime - childAvgFinishTime > 0.5):
+        if (AvgFinishTime <= childAvgFinishTime): #or (AvgFinishTime - childAvgFinishTime > 0.5):
 
             count_gene = count_gene + 1
 
@@ -601,25 +605,40 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
             # else:
             #     continue
 
-            if count_gene > 6000:
-                Truck_result[0] = childTruckSeq[1:childTruckCutPosition[0]+1]
+           # If there are more than 500 chromosomes --> 
+            if count_gene > 500:
+                listOfValue.append(Reality_dict)
+                Reality_dict = {} # Reset Dict
+                isfirst = True
+                pop_size = count_gene
+                count_gene = 0
+                Genetic_dict[count] = [AvgFinishTime]
+
+                #ChildTruck and ChildCrane list
+
+                Truck_result[0] = Trucksequence[1:Parent_truck_cut_position[0]+1]
                 Truck_result[0].sort()
                 for i in range(1, a):
-                    Truck_result[i] = childTruckSeq[childTruckCutPosition[i-1]+1:childTruckCutPosition[i]+1]
+                    Truck_result[i] = Trucksequence[Parent_truck_cut_position[i-1]+1:Parent_truck_cut_position[i]+1]
                     Truck_result[i].sort()
 
-                Crane_result[0] = childCraneSeq[1:childCraneCutPosition[0]+1]
+                Crane_result[0] = Cranesequence[1:Parent_crane_cut_position[0]+1]
                 Crane_result[0].sort()
                 for i in range(1, c):
-                    Crane_result[i] = childCraneSeq[childCraneCutPosition[i-1]+1:childCraneCutPosition[i]+1]
+                    Crane_result[i] = Cranesequence[Parent_crane_cut_position[i-1]+1:Parent_crane_cut_position[i]+1]
                     Crane_result[i].sort()
 
-                df1 = pd.DataFrame([childTruckSeq, childCraneSeq], index=['TruckSequence', 'CraneSequence'])
+                df1 = pd.DataFrame([Trucksequence, Cranesequence], index=['TruckSequence', 'CraneSequence'])
                 df = df.append(df1)
+
+                print("\nGeneration:", count)
+                print(lst_contTime)
+                print("Cmin = ", AvgFinishTime)
+                print("Population Size of gene {0}: {1}".format(count, pop_size+1))
+
                 count = count + 1
-                break
-            else:
                 continue
+            else: continue
 
         listOfValue.append(Reality_dict)
         Reality_dict = {} # Reset Dict
