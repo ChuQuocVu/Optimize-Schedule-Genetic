@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import time
 
 def draw_graph(iteration, fitness):
-    plt.plot(iteration, fitness, 'go-', label='Genetic_value')
+    plt.plot(iteration, fitness, 'g-', label='Genetic_value')
     plt.title('Graph showing the relationship between Iteration and Fitness_Value')
     plt.xlabel('Iteration')
     plt.ylabel('Fitness Value')
@@ -556,7 +556,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
     print("Truck's mutation_rate: {0}".format(truck_rate))
     print("Crane's mutation_rate: {0}".format(crane_rate))
 
-    while True:
+    while count <= 500:
         
         if isfirst:
             preChildAvgFinishTime = childAvgFinishTime
@@ -584,7 +584,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
       
 
         # Selective
-        if (AvgFinishTime <= childAvgFinishTime): #or (AvgFinishTime - childAvgFinishTime > 0.5):
+        if (AvgFinishTime <= childAvgFinishTime) or (AvgFinishTime - childAvgFinishTime > 0.3):
 
             count_gene = count_gene + 1
 
@@ -606,7 +606,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
             #     continue
 
            # If there are more than 500 chromosomes --> 
-            if count_gene > 500:
+            if count_gene > 1000:
                 listOfValue.append(Reality_dict)
                 Reality_dict = {} # Reset Dict
                 isfirst = True
@@ -674,11 +674,6 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
         AvgFinishTime = childAvgFinishTime
         count = count + 1
 
-        if count > 1000:
-            break
-        else:
-            continue
-
     for i in range(0,a):
         Truck_idx_lst.append('Truck {0}'.format(i+1))
 
@@ -714,7 +709,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
     print("Truck Sequence: ",childTruckSeq)
     print("Crane Sequence: ",childCraneSeq)
     print("{0} = {1}".format(" Cmin", AvgFinishTime))
-    print("Population Size of gene {0}: {1}".format(count-1, count_gene+1))
+    print("Population Size of gene {0}: {1}".format(count-1, pop_size+1))
     print("Total Generation: ", count-1)
     print("Result is added in 'Result.xlsx!'")
     end_time = time.time()
@@ -722,7 +717,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
 
     for i in range(len(listOfValue)):
         color = (rd.random(), rd.random(), rd.random())
-        plt.plot(list(listOfValue[i].keys()), list(listOfValue[i].values()), linewidth='1', c=color, label=str(i+1))
+        plt.plot(list(listOfValue[i].keys()), list(listOfValue[i].values()), linewidth='1', c=color)
 
     plt.title('Graph showing the relationship between Chromosomes and Fitness')
     plt.xlabel('Chromosomes')
