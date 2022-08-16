@@ -465,11 +465,6 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
                         jobFinishTime[x] = jobFinishTime[x] + Truck_process[k][i]
                 Truck_Complete[k] = Truck_ready[k][i] + Truck_process[k][i]
 
-
-    # Cmax_Truck = max(Truck_Complete)
-    # Cmax_Truck = sum(Truck_Complete)
-
-
     ############################################################ ASSIGN CRANE READY ######################################################################
     Crane_ready = [0]*len(Crane)
     Crane_process = [0]*len(Crane)
@@ -528,14 +523,9 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
                         jobFinishTime[x] = jobFinishTime[x] + Crane_process[k][i]
                         
 
-    # Cmax_Crane = max(Crane_Complete)
     AvgFinishTime = float(sum(jobFinishTime.values())/len(jobFinishTime.values()))
-    # Cmax_Crane = sum(Crane_Complete)
 
     ###################################################################### CMAX OF SOLUTION ############################################################
-
-    # Cmax = sum([Cmax_Truck, Cmax_Crane])
-    # Cmax = Cmax_Truck + Cmax_Crane
 
     df = pd.DataFrame([Trucksequence, Cranesequence], index=['TruckSequence', 'CraneSequence'])
     Truck_result = [0]*a
@@ -547,6 +537,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
     Genetic_dict = {}
     Reality_dict = {}
     listOfValue = []
+    parent_lstcontTime = list(jobFinishTime.values())
 
     count = 1
     isfirst = True
@@ -556,7 +547,8 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
     print("Truck's mutation_rate: {0}".format(truck_rate))
     print("Crane's mutation_rate: {0}".format(crane_rate))
 
-    while count <= 500:
+    # Fix this value if you want to change total generation
+    while count <= 200:
         
         if isfirst:
             preChildAvgFinishTime = childAvgFinishTime
@@ -574,8 +566,8 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
         # if (mutationRate_accepted(Trucksequence, childTruckSeq, truck_rate) == False) or (mutationRate_accepted(Cranesequence, childCraneSeq, crane_rate) == False):
         #     continue
 
-        """ This fuction use to test mutation_rate
-            If the mutation rate is not accepted 
+        """ This fuction use to test mutation_rate!
+            If the mutation rate is not accepted:
             --> this function will show sequence's current mutation rate """   
 
         if (mutationRate_accepted_test(Trucksequence, childTruckSeq) < truck_rate) or (mutationRate_accepted_test(Cranesequence, childCraneSeq) < crane_rate):
@@ -592,18 +584,6 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
                 isfirst = False
                 preChildAvgFinishTime = childAvgFinishTime
                 Reality_dict[count_gene - 1] = childAvgFinishTime
-            
-            # Test function
-            
-            # if count_gene == 100:
-            #     print("Truck Sequence: ",childTruckSeq)
-            #     print("Crane Sequence: ",childCraneSeq)
-            #     print("Cmin = ", childAvgFinishTime)
-            #     print("Population Size of gene {0}: {1}".format(count, count_gene))
-            #     print("End Program!")
-            #     break
-            # else:
-            #     continue
 
            # If there are more than 500 chromosomes --> 
             if count_gene > 1000:
@@ -632,7 +612,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
                 df = df.append(df1)
 
                 print("\nGeneration:", count)
-                print(lst_contTime)
+                print("Time of each container: ", list(parent_lstcontTime))
                 print("Cmin = ", AvgFinishTime)
                 print("Population Size of gene {0}: {1}".format(count, pop_size+1))
 
@@ -648,6 +628,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
         Trucksequence = childTruckSeq
         Cranesequence = childCraneSeq
         Genetic_dict[count] = [childAvgFinishTime]
+        parent_lstcontTime = lst_contTime
 
         #ChildTruck and ChildCrane list
 
@@ -667,7 +648,7 @@ def Genetic(n, a, c, truck_rate, crane_rate, truck_ready, truck_processtime, cra
         df = df.append(df1)
 
         print("\nGeneration:", count)
-        print(lst_contTime)
+        print("Time of each container: ", list(lst_contTime))
         print("Cmin = ", childAvgFinishTime)
         print("Population Size of gene {0}: {1}".format(count, pop_size+1))
 
